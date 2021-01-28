@@ -1,0 +1,25 @@
+{
+    "name": "be/ff",
+    "type": "library",
+    "description": "PHP BE 前端框架（Frontend Framework）",
+    "keywords": ["PHP", "Be", "Frontend", "Framework", "前端框架"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "liu12",
+            "email": "i@liu12.com",
+            "homepage": "http://www.liu12.com/"
+        }
+    ],
+    "require": {
+        "be/f": "^2.1",
+        "be/f-session": "^2.1",
+        "be/f-template": "^2.1",
+        "be/f-lib": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Be\\Ff\\": "src"
+        }
+    }
+}
