@@ -18,6 +18,12 @@ class System
     public $urlSuffix = '.html';
 
     /**
+     * @BeConfigItem("主题",
+     *     driver="FormItemSelect")
+     */
+    public $theme = 'Blank';
+
+    /**
      * @BeConfigItem("允许上传的文件大小", driver="FormItemInput")
      */
     public $uploadMaxSize = '100M';
