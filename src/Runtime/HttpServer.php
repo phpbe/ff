@@ -15,7 +15,7 @@ class HttpServer
     /**
      * @var \Swoole\Http\Server
      */
-    private $server = null;
+    private $swooleHttpServer = null;
 
     CONST MIME = [
         'html' => 'text/html',
@@ -74,29 +74,55 @@ class HttpServer
 
     public function start()
     {
-        if ($this->server !== null) {
+        if ($this->swooleHttpServer !== null) {
             return;
         }
 
         \Co::set(['hook_flags' => SWOOLE_HOOK_ALL]);
 
-        // 检查网站配置， 是否暂停服务
-        $configSystem = Be::getConfig('System.System');
+        $configSystem = ConfigFactory::getInstance('System.System');
         date_default_timezone_set($configSystem->timezone);
 
-        $this->server = new \Swoole\Http\Server("0.0.0.0", 80);
-        $this->server->set(['enable_coroutine' => true]);
+        $configServer = ConfigFactory::getInstance('System.Server');
+        $this->swooleHttpServer = new \Swoole\Http\Server($configServer->host, $configServer->port);
+
+        $setting = [
+            'enable_coroutine' => true,
+        ];
+
+        if ($configServer->reactor_num > 0) {
+            $setting['reactor_num'] = $configServer->reactor_num;
+        }
+
+        if ($configServer->worker_num > 0) {
+            $setting['worker_num'] = $configServer->worker_num;
+        }
+
+        if ($configServer->max_request > 0) {
+            $setting['max_request'] = $configServer->max_request;
+        }
+
+        if ($configServer->max_conn > 0) {
+            $setting['max_conn'] = $configServer->max_conn;
+        }
+
+        $this->swooleHttpServer->set($setting);
 
         // 初始化Redis连接池
         RedisFactory::init();
 
-        $sessionConfig = ConfigFactory::getInstance('System.Session');
-        if ($sessionConfig->driver == 'File') {
-            $dir = RuntimeFactory::getInstance()->getCachePath() . '/session';
+        if ($configServer->clearCacheOnStart) {
+            $dir = RuntimeFactory::getInstance()->getCachePath();
             \Be\F\Util\FileSystem\Dir::rm($dir);
+        } else {
+            $sessionConfig = ConfigFactory::getInstance('System.Session');
+            if ($sessionConfig->driver == 'File') {
+                $dir = RuntimeFactory::getInstance()->getCachePath() . '/session';
+                \Be\F\Util\FileSystem\Dir::rm($dir);
+            }
         }
 
-        $this->server->on('request', function ($swRequest, $swResponse) {
+        $this->swooleHttpServer->on('request', function ($swRequest, $swResponse) {
             /**
              * @var \Swoole\Http\Response $swResponse
              */
@@ -153,7 +179,7 @@ class HttpServer
             }
 
             $request = new \Be\F\Request\Driver($swRequest);
-            $response = new \Be\Ff\Response\Driver($swResponse);
+            $response = new \Be\F\Response\Driver($swResponse);
 
             RequestFactory::setInstance($request);
             ResponseFactory::setInstance($response);
@@ -249,25 +275,24 @@ class HttpServer
             return true;
         });
 
-        $this->server->start();
+        $this->swooleHttpServer->start();
     }
+
 
 
     public function stop()
     {
-        $this->server->stop();
-
-        $sessionConfig = ConfigFactory::getInstance('System.Session');
-        if ($sessionConfig->driver == 'File') {
-            $dir = RuntimeFactory::getInstance()->getCachePath() . '/session';
-            \Be\F\Util\FileSystem\Dir::rm($dir);
-        }
+        $this->swooleHttpServer->stop();
     }
-
 
     public function reload()
     {
-        $this->server->reload();
+        $this->swooleHttpServer->reload();
+    }
+
+    public function getSwooleHttpServer()
+    {
+        return $this->swooleHttpServer;
     }
 
 }
