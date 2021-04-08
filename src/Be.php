@@ -4,7 +4,7 @@ namespace Be\Ff;
 
 use Be\F\Config\ConfigFactory;
 use Be\F\Lib\LibFactory;
-use Be\F\Logger\LoggerFactory;
+use Be\F\Log\LogFactory;
 use Be\F\Property\PropertyFactory;
 use Be\F\Request\RequestFactory;
 use Be\F\Response\ResponseFactory;
@@ -45,7 +45,7 @@ abstract class Be
     /**
      * 获取输出对象
      *
-     * @return \Be\F\Response\Driver | \Be\Ff\Response\Driver
+     * @return \Be\F\Response\Driver
      */
     public static function getResponse()
     {
@@ -77,11 +77,11 @@ abstract class Be
     /**
      * 获取日志记录器
      *
-     * @return \Be\F\Logger\Driver
+     * @return \Be\F\Log\Driver
      */
-    public static function getLogger()
+    public static function getLog()
     {
-        return LoggerFactory::getInstance();
+        return LogFactory::getInstance();
     }
 
     /**
@@ -174,7 +174,7 @@ abstract class Be
         foreach ([
                      '\\Be\\F\\Request\\RequestFactory',
                      '\\Be\\F\\Response\\ResponseFactory',
-                     '\\Be\\F\\Logger\\LoggerFactory',
+                     '\\Be\\F\\Log\\LogFactory',
                      '\\Be\\F\\Session\\SessionFactory',
                      '\\Be\\F\\App\\ServiceFactory',
                      '\\Be\\F\\Lib\\LibFactory',
