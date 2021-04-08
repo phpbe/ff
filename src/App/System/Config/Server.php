@@ -1,5 +1,5 @@
 <?php
-namespace Be\Mf\App\System\Config;
+namespace Be\Ff\App\System\Config;
 
 /**
  * @BeConfig("服务器")
