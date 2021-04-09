@@ -167,6 +167,16 @@ abstract class Be
     }
 
     /**
+     * 获取当前用户
+     *
+     * @return object
+     */
+    public static function getUser()
+    {
+        return Be::getSession()->get('_user');
+    }
+
+    /**
      * 回收资源
      */
     public static function release()
