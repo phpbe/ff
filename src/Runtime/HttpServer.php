@@ -268,7 +268,7 @@ class HttpServer
 
             } catch (\Throwable $t) {
                 $response->exception($t);
-                Be::getLogger()->emergency($t);
+                Be::getLog()->emergency($t);
             }
 
             Be::release();
