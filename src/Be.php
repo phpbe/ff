@@ -176,23 +176,4 @@ abstract class Be
         return Be::getSession()->get('_user');
     }
 
-    /**
-     * 回收资源
-     */
-    public static function release()
-    {
-        foreach ([
-                     '\\Be\\F\\Request\\RequestFactory',
-                     '\\Be\\F\\Response\\ResponseFactory',
-                     '\\Be\\F\\Log\\LogFactory',
-                     '\\Be\\F\\Session\\SessionFactory',
-                     '\\Be\\F\\App\\ServiceFactory',
-                     '\\Be\\F\\Lib\\LibFactory',
-                     '\\Be\\F\\Template\\TemplateFactory',
-
-                     '\\Be\\F\\Redis\\RedisFactory',
-                 ] as $factoryClass) {
-            $factoryClass::release();
-        }
-    }
 }

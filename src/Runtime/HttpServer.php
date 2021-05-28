@@ -3,6 +3,7 @@
 namespace Be\Ff\Runtime;
 
 use Be\F\Config\ConfigFactory;
+use Be\F\Gc;
 use Be\F\Redis\RedisFactory;
 use Be\F\Request\RequestFactory;
 use Be\F\Response\ResponseFactory;
@@ -244,8 +245,8 @@ class HttpServer
                         $controller = $routes[1];
                         $action = $routes[2];
                     } else {
-                        $response->error('路由参数（' . $route . '）无法识别！');
-                        Be::release();
+                        $response->error('Route (' . $route . ') parse error!');
+                        Gc::release(\Swoole\Coroutine::getuid());
                         return true;
                     }
                 }
@@ -255,14 +256,14 @@ class HttpServer
                 $class = 'Be\\Ff\\App\\' . $app . '\\Controller\\' . $controller;
                 if (!class_exists($class)) {
                     $response->set('code', 404);
-                    $response->error('控制器 ' . $app . '/' . $controller . ' 不存在！');
+                    $response->error('Controller ' . $app . '/' . $controller . ' doesn\'t exist!');
                 } else {
                     $instance = new $class();
                     if (method_exists($instance, $action)) {
                         $instance->$action();
                     } else {
                         $response->set('code', 404);
-                        $response->error('未定义的任务：' . $action);
+                        $response->error('Undefined action ' . $action . ' of class ' . $class . '!');
                     }
                 }
 
@@ -271,7 +272,7 @@ class HttpServer
                 Be::getLog()->emergency($t);
             }
 
-            Be::release();
+            Gc::release(\Swoole\Coroutine::getuid());
             return true;
         });
 
